@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel de manutenção, equipe 5</title>
+<style>
+:root{--bg:#fff;--card:#f4f5f7;--txt:#16181d;--mut:#4f555e;--line:#d5d8de;--az:#2a78d6;--la:#C4551F;--ci:#6E747C;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14161a;--card:#1e2126;--txt:#eceef1;--mut:#a9afb8;--line:#3a3f47}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#14161a;--card:#1e2126;--txt:#eceef1;--mut:#a9afb8;--line:#3a3f47}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px}
+.wrap{max-width:1120px;margin:0 auto}
+h1{font-size:clamp(20px,3vw,27px);line-height:1.25;margin:0 0 4px}
+.sub{color:var(--mut);font-size:14px;margin:0 0 16px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.kpi{background:var(--card);border-radius:12px;padding:14px 16px;border-top:5px solid var(--ci)}
+.kpi b{display:block;font-size:clamp(30px,5vw,42px);line-height:1.1}
+.kpi span{color:var(--mut);font-size:14px}
+.kpi i{display:inline-block;margin-top:6px;font-style:normal;font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px}
+.main{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.card{background:var(--card);border-radius:12px;padding:14px 16px;min-width:0}
+h2{font-size:15px;margin:0 0 8px}
+.tabs{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+button{font:inherit;font-size:14px;padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--txt);cursor:pointer}
+button[aria-pressed="true"]{background:var(--az);border-color:var(--az);color:#fff}
+button:focus-visible,g:focus-visible{outline:3px solid var(--la);outline-offset:2px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--txt);font-size:11px}svg .m{fill:var(--mut)}svg g{cursor:pointer}
+.det{margin-top:8px;padding:10px 12px;border-left:5px solid var(--az);background:var(--bg);border-radius:6px;font-size:15px}
+.leg{font-size:13px;color:var(--mut);margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}
+.frase{margin-top:12px;background:var(--card);border-radius:12px;padding:14px 16px;font-size:17px}
+.lim{margin-top:12px;background:var(--card);border-radius:12px;padding:12px 16px;font-size:14px;color:var(--mut)}
+.lim b{color:var(--txt)}.lim ul{margin:6px 0 0;padding-left:20px}
+@media(max-width:760px){.kpis,.main{grid-template-columns:1fr}}
+@media print{button{display:none}body{padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Nos registros simulados, a quebra foi de 15,36% com 200 min de uso ou mais, contra 2,35% abaixo disso, equipe 5</h1>
+<p class="sub">Leia nesta ordem: indicadores, salto da taxa na figura principal, modos de falha, limites. Clique em um ponto para ver os números da faixa.</p>
+
+<div class="kpis">
+ <div class="kpi"><b>3,39%</b><span>339 quebras em 10.000 peças<br>no total</span></div>
+ <div class="kpi" style="border-color:var(--az)"><b style="color:var(--az)">2,35%</b><span>216 quebras em 9.199 peças<br>antes de 200 min de uso</span></div>
+ <div class="kpi" style="border-color:var(--la)"><b style="color:var(--la)">15,36%</b><span>123 quebras em 801 peças<br>a partir de 200 min de uso</span><br><i>cerca de 6,5 vezes a taxa abaixo de 200 min</i></div>
+</div>
+
+<div class="main">
+ <div class="card">
+  <div class="tabs" role="group" aria-label="Figura principal">
+   <button id="bUso" aria-pressed="true">Taxa por faixa de uso</button>
+   <button id="bTor" aria-pressed="false">Achado: faixa de torque</button>
+   <button id="bTab" aria-pressed="false">Ver como tabela</button>
+  </div>
+  <h2 id="tit"></h2>
+  <svg id="g1" viewBox="0 0 640 320" role="img" aria-labelledby="tit"></svg>
+  <div id="tb" hidden></div>
+  <div class="det" id="det" aria-live="polite"></div>
+  <div class="leg" id="leg"></div>
+ </div>
+ <div class="card">
+  <h2>Modos de falha, antes e a partir de 200 min</h2>
+  <svg id="g2" viewBox="0 0 320 330" role="img" aria-label="Barras com a porcentagem de cada modo de falha nos dois grupos"></svg>
+  <div class="leg">% das quebras do grupo (uma quebra pode ter mais de um modo). Barras com hachura: a partir de 200 min. Passe o mouse para ver a contagem.</div>
+ </div>
+</div>
+
+<div class="frase">Com 200 min de uso ou mais, foram 123 quebras em 801 peças (15,36%). Abaixo disso, 216 em 9.199 (2,35%). A comparação descreve estes registros simulados e não prova que o uso causa a quebra. Vale olhar com atenção as peças a partir de 200 min.</div>
+
+<div class="lim"><b>Limites da leitura</b>
+<ul>
+<li>Dados simulados (AI4I 2020, UCI, DOI 10.24432/C5HS5C). O corte de 200 min é só o recorte usado para comparar, não um limiar validado de manutenção.</li>
+<li>Associação, não causa. O intervalo de Wilson supõe peças independentes, mas a produção é sequencial.</li>
+<li>Ponto vazado: faixa com menos de 100 peças, taxa instável. Na análise de torque, 217 peças sem torque medido (9 quebras) ficaram de fora.</li>
+</ul></div>
+</div>
+
+<script>
+const AZ="#2a78d6",LA="#C4551F";
+// [início, peças, quebras, limite inferior %, limite superior %]
+const USO=[[0,1210,31,1.81,3.61],[25,1139,21,1.21,2.80],[50,1147,25,1.48,3.20],[75,1124,26,1.58,3.37],[100,1149,27,1.62,3.40],[125,1141,25,1.49,3.21],[150,1136,25,1.50,3.23],[175,1153,36,2.26,4.29],[200,720,97,11.17,16.16],[225,79,24,21.34,41.23],[250,2,2,34.24,100]];
+const TOR=[[0,11,11,74.12,100],[10,211,23,7.37,15.83],[20,1324,9,0.36,1.29],[30,3291,18,0.35,0.86],[40,3409,65,1.50,2.42],[50,1305,107,6.83,9.81],[60,218,84,32.32,45.14],[70,14,13,68.53,98.73]];
+// [modo, quebras antes de 200 min (de 216), quebras a partir de 200 min (de 123)]
+const MODOS=[["calor",104,11],["sobrecarga",28,70],["potência",87,8],["desgaste",1,45],["acaso",0,1]];
+const DS={
+ uso:{tit:"Taxa de quebra por faixa de 25 min de uso, com intervalo de 95%",d:USO,rot:d=>d[0],faixa:d=>d[0]+" a "+(d[0]+24)+" min de uso",x:"início da faixa de uso da ferramenta (min) e peças na faixa (n)",corte:200,ref:3.39,
+  leg:"Até 199 min a taxa fica entre 1,84% e 3,12%. Em 200 min chega a 13,47%. As faixas de 225 e 250 min têm poucas peças."},
+ tor:{tit:"Achado: taxa de quebra por faixa de torque de 10 Nm, com intervalo de 95%",d:TOR,rot:d=>d[0]+" a "+(d[0]+10),faixa:d=>d[0]+" a "+(d[0]+10)+" Nm",x:"faixa de torque (Nm) e peças na faixa (n)",corte:60,ref:null,
+  leg:"Entre as faixas com 100 peças ou mais, a maior é a de 60 a 70 Nm: 84 quebras em 218 peças (38,53%), contra 18 em 3.291 (0,55%) em 30 a 40 Nm. Associação nestes dados simulados, não causa."}
+};
+let cur="uso",tab=false;const sel={uso:8,tor:6};
+const br=(v,c=2)=>v.toLocaleString("pt-BR",{minimumFractionDigits:c,maximumFractionDigits:c});
+const S=(t,a,x)=>{const e=document.createElementNS("http://www.w3.org/2000/svg",t);for(const k in a)e.setAttribute(k,a[k]);if(x!=null)e.textContent=x;return e};
+const txt=(s,d)=>{const t=100*d[2]/d[1];return `${s.faixa(d)}: ${d[2]} quebras em ${br(d[1],0)} peças = ${br(t)}% (intervalo de 95%: ${br(d[3])}% a ${br(d[4])}%).`+(d[1]<100?" Faixa com poucas peças, taxa instável.":"")};
+
+function draw(){
+ const s=DS[cur],g=document.getElementById("g1"),L=52,R=620,T=14,B=270,H=B-T,W=R-L,n=s.d.length;g.innerHTML="";
+ document.getElementById("tit").textContent=s.tit;
+ for(let v=0;v<=100;v+=20){const y=B-v/100*H;g.append(S("line",{x1:L,x2:R,y1:y,y2:y,stroke:"currentColor","stroke-opacity":.12}),S("text",{x:L-8,y:y+4,"text-anchor":"end",class:"m"},v))}
+ g.append(S("text",{x:12,y:T+H/2,transform:`rotate(-90 12 ${T+H/2})`,"text-anchor":"middle",class:"m"},"taxa de quebra (%)"));
+ if(s.ref){const y=B-s.ref/100*H;g.append(S("line",{x1:L,x2:R,y1:y,y2:y,stroke:"var(--ci)","stroke-dasharray":"5 4"}),S("text",{x:R,y:y-12,"text-anchor":"end",class:"m"},"taxa geral 3,39%"))}
+ const ic=s.d.findIndex(d=>d[0]===s.corte);
+ if(cur==="uso"){const x=L+W*ic/n;g.append(S("line",{x1:x,x2:x,y1:T,y2:B,stroke:"var(--ci)","stroke-dasharray":"4 4"}),S("text",{x:x+6,y:T+14,class:"m"},"a partir de 200 min"))}
+ s.d.forEach((d,i)=>{
+  const x=L+W*(i+.5)/n,taxa=100*d[2]/d[1],cor=i>=ic?LA:AZ,vazio=d[1]<100;
+  const gp=S("g",{tabindex:0,role:"button","aria-label":txt(s,d)});gp.append(S("title",{},txt(s,d)));
+  gp.append(S("rect",{x:x-W/n/2,y:T,width:W/n,height:H+36,fill:"transparent"}));
+  if(i===sel[cur])gp.append(S("circle",{cx:x,cy:B-taxa/100*H,r:11,fill:"none",stroke:"var(--txt)","stroke-width":1.5}));
+  gp.append(S("line",{x1:x,x2:x,y1:B-d[3]/100*H,y2:B-d[4]/100*H,stroke:cor,"stroke-width":3}));
+  gp.append(S("circle",{cx:x,cy:B-taxa/100*H,r:6,fill:vazio?"var(--card)":cor,stroke:cor,"stroke-width":2.5}));
+  gp.append(S("text",{x:x,y:B+16,"text-anchor":"middle"},s.rot(d)),S("text",{x:x,y:B+30,"text-anchor":"middle",class:"m"},"n="+br(d[1],0)));
+  const ir=()=>{sel[cur]=i;draw()};gp.onclick=ir;gp.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();ir()}};
+  g.append(gp);
+ });
+ g.append(S("text",{x:L+W/2,y:316,"text-anchor":"middle",class:"m"},s.x));
+ document.getElementById("det").textContent=txt(s,s.d[sel[cur]]);
+ document.getElementById("leg").textContent=s.leg;
+ let h="<table><tr><th>Faixa</th><th>Peças</th><th>Quebras</th><th>Taxa</th><th>Intervalo 95%</th></tr>";
+ s.d.forEach(d=>h+=`<tr><td>${s.faixa(d)}</td><td>${br(d[1],0)}</td><td>${d[2]}</td><td>${br(100*d[2]/d[1])}%</td><td>${br(d[3])}% a ${br(d[4])}%</td></tr>`);
+ document.getElementById("tb").innerHTML=h+"</table>";
+ g.hidden=tab;document.getElementById("tb").hidden=!tab;
+}
+function modos(){
+ const g=document.getElementById("g2"),L=80,W=190,NA=216,ND=123;
+ const d=S("defs",{}),p=S("pattern",{id:"h",width:6,height:6,patternUnits:"userSpaceOnUse",patternTransform:"rotate(45)"});
+ p.append(S("rect",{width:3,height:6,fill:"#fff","fill-opacity":.55}));d.append(p);g.append(d);
+ MODOS.forEach((m,i)=>{
+  const y=10+i*60;g.append(S("text",{x:L-8,y:y+30,"text-anchor":"end"},m[0]));
+  [[m[1],NA,AZ,0,"antes de 200 min"],[m[2],ND,LA,1,"a partir de 200 min"]].forEach(([q,den,c,h,nome])=>{
+   const v=100*q/den,w=v/60*W,yy=y+h*22+4,gp=S("g",{});
+   gp.append(S("title",{},`${m[0]}, ${nome}: ${q} de ${den} quebras (${br(v,1)}%)`),S("rect",{x:L,y:yy,width:w,height:18,fill:c}));
+   if(h)gp.append(S("rect",{x:L,y:yy,width:w,height:18,fill:"url(#h)"}));
+   gp.append(S("text",{x:L+w+4,y:yy+14},v>0&&v<1?"<1%":Math.round(v)+"%"));g.append(gp);
+  });
+ });
+ g.append(S("rect",{x:14,y:312,width:10,height:10,fill:AZ}),S("text",{x:28,y:321,class:"m"},"antes (216 quebras)"),S("rect",{x:160,y:312,width:10,height:10,fill:LA}),S("text",{x:174,y:321,class:"m"},"a partir de 200 (123)"));
+}
+const B={u:document.getElementById("bUso"),t:document.getElementById("bTor"),b:document.getElementById("bTab")};
+function ui(){B.u.setAttribute("aria-pressed",cur==="uso");B.t.setAttribute("aria-pressed",cur==="tor");B.b.setAttribute("aria-pressed",tab);draw()}
+B.u.onclick=()=>{cur="uso";ui()};B.t.onclick=()=>{cur="tor";ui()};B.b.onclick=()=>{tab=!tab;ui()};
+ui();modos();
+</script>
+</body>
+</html>
